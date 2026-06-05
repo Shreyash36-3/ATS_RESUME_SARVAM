@@ -15,7 +15,7 @@ func ConnectDB() {
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
 		// UPDATE THIS LINE with your local postgres username and password
-		dsn = "postgres://postgres:password@localhost:5432/ats_db"
+		dsn = "postgres://postgres:5630@localhost:5432/ats_db?sslmode=disable"
 	}
 
 	pool, err := pgxpool.New(context.Background(), dsn)

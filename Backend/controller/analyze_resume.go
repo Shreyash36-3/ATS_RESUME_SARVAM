@@ -1,13 +1,16 @@
 package controller
 
 import (
+	"Backend/config"
 	"Backend/internal/db"
+	"Backend/internal/helpers"
 	"Backend/internal/schema"
 	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -51,13 +54,14 @@ func AnalyzeResume(c *gin.Context) {
 	}
 
 	// 4. Upload to S3
-	/*s3Client, err := helpers.NewS3Client(
+	s3Client, err := helpers.NewS3Client(
 		os.Getenv("AWS_ACCESS_KEY_ID"),
 		os.Getenv("AWS_SECRET_ACCESS_KEY"),
 		os.Getenv("AWS_REGION"),
 		os.Getenv("AWS_S3_BUCKET"),
 	)
 	if err != nil {
+		log.Println("UPLOAD ERROR : ", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to initialize S3 client"})
 		return
 	}
@@ -65,10 +69,11 @@ func AnalyzeResume(c *gin.Context) {
 	s3Key := fmt.Sprintf("resumes/%d/%s", seekerID, header.Filename)
 	resumeURL, err := s3Client.UploadFile(context.Background(), s3Key, bytes.NewReader(fileBytes), "application/pdf")
 	if err != nil {
+		log.Println("UPLOAD ERROR : ", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload to S3"})
 		return
-	}*/
-	resumeURL := "https://dummy-url.com/" + header.Filename
+	}
+	/*resumeURL := "https://dummy-url.com/" + header.Filename*/
 
 	// 5. Call Mistral AI
 	mistralAPIKey := os.Getenv("MISTRAL_API_KEY")
@@ -553,4 +558,21 @@ func DeleteResumeHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Resume history deleted successfully"})
+}
+
+func GetUsageCountHandler(c *gin.Context) {
+	// Grab the hardcoded "1" from your dummy middleware
+	userID := c.GetString("userID")
+
+	var count int
+	// Count how many times this user ID appears in the analyses table
+	err := config.DB.QueryRow(context.Background(), "SELECT COUNT(*) FROM resume_analyses WHERE user_id = $1", userID).Scan(&count)
+	if err != nil {
+		log.Println("Database count error:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count usage"})
+		return
+	}
+
+	// Send the number back to React
+	c.JSON(http.StatusOK, gin.H{"usage_count": count})
 }

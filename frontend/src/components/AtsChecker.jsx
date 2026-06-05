@@ -516,13 +516,6 @@ const ATSChecker = () => {
             >
               <FaRobot /> New Analysis
             </button>
-            <button
-              onClick={() => window.print()}
-              className="px-8 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl 
-                       transition-all duration-300 font-bold flex items-center justify-center gap-2 border border-gray-600"
-            >
-              <FaFileUpload /> Download Report
-            </button>
           </div>
         </div>
       );
@@ -583,11 +576,8 @@ const ATSChecker = () => {
         <div className={`mb-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6 transition-all duration-700 delay-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <div>
             <h1 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">AI Resume</span> Checker
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">Resume</span> Checker
             </h1>
-            <p className="text-gray-400 text-lg max-w-xl leading-relaxed">
-              Optimize your resume for applicant tracking systems with detailed AI-powered insights and scoring.
-            </p>
           </div>
           
           <button 
@@ -685,37 +675,8 @@ const ATSChecker = () => {
                   </div>
                 </div>
 
-                {/* Analysis Type */}
-                <div className="mb-8">
-                  <label className="block text-lg font-semibold mb-2 flex items-center">
-                    <FaSearch className="mr-2 text-blue-400" />
-                    Analysis Type
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {["Quick Scan", "Detailed Analysis", "ATS Optimization"].map((type) => (
-                      <div 
-                        key={type}
-                        onClick={() => !loading && setAnalysisType(type)} 
-                        className={`p-4 rounded-xl cursor-pointer transition-all duration-300
-                                  ${analysisType === type 
-                                    ? 'bg-blue-500/20 border-2 border-blue-500/50 shadow-lg shadow-blue-500/10' 
-                                    : 'bg-gray-700/50 border border-gray-600/50 hover:bg-gray-700/90'}`}
-                      >
-                        <div className="flex flex-col items-center text-center">
-                          <div className={`h-10 w-10 rounded-full flex items-center justify-center mb-2
-                                        ${analysisType === type ? 'bg-blue-500/30' : 'bg-gray-600/30'}`}>
-                            {type === "Quick Scan" && <FaRobot className={analysisType === type ? 'text-blue-400' : 'text-gray-400'} />}
-                            {type === "Detailed Analysis" && <FaSearch className={analysisType === type ? 'text-blue-400' : 'text-gray-400'} />}
-                            {type === "ATS Optimization" && <FaMagic className={analysisType === type ? 'text-blue-400' : 'text-gray-400'} />}
-                          </div>
-                          <span className={`font-medium ${analysisType === type ? 'text-blue-400' : 'text-gray-300'}`}>
-                            {type}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                
+                
                 
                 {/* Submit Button */}
                 <button

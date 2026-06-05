@@ -7,12 +7,12 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
-// Dummy auth middleware to mimic what your controllers expect
+// Dummy auth middleware
 func DummyAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Hardcoding a user ID of 1 for local testing
 		c.Set("userID", "1")
 		c.Next()
 	}
@@ -20,6 +20,10 @@ func DummyAuthMiddleware() gin.HandlerFunc {
 
 func main() {
 	// 1. Connect to Database
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("No .env file")
+	}
 	config.ConnectDB()
 
 	// 2. Initialize Gin Router
