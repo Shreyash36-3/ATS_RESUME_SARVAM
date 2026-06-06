@@ -28,7 +28,7 @@ const ATSChecker = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [view, setView] = useState("checker"); // checker, history, detail
   const [selectedAnalysisId, setSelectedAnalysisId] = useState(null);
-
+  const [limitError , setLimitError]=useState(null);
   // Animation settings
   useEffect(() => {
     setMounted(true);
@@ -48,6 +48,7 @@ const ATSChecker = () => {
     
     setLoading(true);
     setResponse(null);
+    setLimitError(null);
     setUploadProgress(10);
 
     try {
@@ -67,6 +68,13 @@ const ATSChecker = () => {
         body: formData,
       });
 
+      if(response.status === 429){
+        const errorData = await response.json();
+        setLimitError(errorData.error);
+        setLoading(false);
+        setUploadProgress(0);
+        return;
+      }
       setUploadProgress(70);
 
       if (!response.ok) {
@@ -551,7 +559,7 @@ const ATSChecker = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white pt-16 pb-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-[#f4f5f8] text-gray-900 pt-16 pb-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 animate-gradient"></div>
@@ -601,7 +609,17 @@ const ATSChecker = () => {
                   <FaFileUpload className="mr-2 text-blue-400" />
                   Upload Your Resume
                 </h2>
-
+                {/* Daily limit Warning Banner*/}
+                {limitError &&(
+                  <div className="bg-red-900/40 border border-red-500/50 rounded-xl p-4 mb-6 flex items-start gap-3 shadow-lg animate-fadeIn">
+                    <FaExclamationTriangle className="text-red-400 text-xl flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold text-red-400">Daily Limit Reached</p>
+                      <p className="text-red-200 text-sm mt-1">{limitError}</p>
+                    </div>
+                  </div>
+                )}
+                {/*----------*/}
                 {/* PDF Upload Area */}
                 <div 
                   className={`relative mb-6 border-2 border-dashed rounded-xl p-8 text-center transition-all

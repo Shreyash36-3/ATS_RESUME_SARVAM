@@ -28,6 +28,22 @@ func AnalyzeResume(c *gin.Context) {
 	}
 	seekerID, _ := strconv.Atoi(fmt.Sprintf("%v", seekerIDStr))
 
+	//Daily limit check
+	const dailylimit = 10
+	var todayCount int
+
+	err := config.DB.QueryRow(context.Background(), "SELECT COUNT(*) FROM resume_analysis WHERE job_seeker_id = $1 AND DATE(created_at) = CURRENT_DATE", seekerID).Scan((&todayCount))
+
+	if err != nil {
+		log.Println("Error checking daily limit:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to verify account limits"})
+		return
+	}
+
+	if todayCount >= dailylimit {
+		c.JSON(http.StatusTooManyRequests, gin.H{"error": "You have reached your daily limit of 10 analyses . Come back tomorrow!"})
+		return
+	}
 	// 2. Parse Multipart Form
 	file, header, err := c.Request.FormFile("resume")
 	if err != nil {
