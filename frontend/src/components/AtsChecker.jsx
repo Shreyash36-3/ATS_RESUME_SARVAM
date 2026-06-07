@@ -16,7 +16,6 @@ import {
 import AtsHistory from "./AtsHistory";
 import AtsDetail from "./AtsDetail";
 
-
 const ATSChecker = () => {
   const [file, setFile] = useState(null);
   const [jobDescription, setJobDescription] = useState("");
@@ -26,10 +25,10 @@ const ATSChecker = () => {
   const [mounted, setMounted] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [view, setView] = useState("checker"); // checker, history, detail
+  const [view, setView] = useState("checker"); 
   const [selectedAnalysisId, setSelectedAnalysisId] = useState(null);
   const [limitError , setLimitError]=useState(null);
-  // Animation settings
+
   useEffect(() => {
     setMounted(true);
     return () => setMounted(false);
@@ -138,21 +137,18 @@ const ATSChecker = () => {
     setUploadProgress(0);
   };
 
-  // Determine if we should show the input section (left column)
-  // After scanning (response exists), we hide the left section
   const showInputSection = !response;
 
-  // Results content that will be used in both layouts
   const renderResults = () => {
     if (!response && !loading) {
       return (
-        <div className="flex flex-col items-center justify-center h-[80%] text-center">
-          <div className="h-20 w-20 mb-6 bg-gray-700/50 rounded-full flex items-center justify-center">
-            <FaRobot className="text-gray-500 text-3xl" />
+        <div className="flex flex-col items-center justify-center h-[80%] text-center py-12">
+          <div className="h-20 w-20 mb-6 bg-[#f0f2f5] rounded-full flex items-center justify-center">
+            <FaRobot className="text-gray-400 text-3xl" />
           </div>
-          <h3 className="text-xl font-semibold mb-2 text-gray-300">No Analysis Yet</h3>
-          <p className="text-gray-400 max-w-md">
-            Upload your resume and click "Analyze Resume" to see how your CV performs with Applicant Tracking Systems
+          <h3 className="text-xl font-bold mb-2 text-gray-900">No Analysis Yet</h3>
+          <p className="text-gray-500 max-w-md text-sm">
+            Upload your resume and click "Analyze Resume" to see how your CV performs against the job description.
           </p>
         </div>
       );
@@ -160,17 +156,17 @@ const ATSChecker = () => {
 
     if (!response && loading) {
       return (
-        <div className="flex flex-col items-center justify-center h-[80%] text-center">
-          <div className="h-20 w-20 mb-6 bg-blue-500/20 rounded-full flex items-center justify-center animate-pulse">
-            <FaRobot className="text-blue-400 text-3xl" />
+        <div className="flex flex-col items-center justify-center h-[80%] text-center py-12">
+          <div className="h-20 w-20 mb-6 bg-[#00203f]/10 rounded-full flex items-center justify-center animate-pulse">
+            <FaRobot className="text-[#00203f] text-3xl" />
           </div>
-          <h3 className="text-xl font-semibold mb-2 text-blue-300">Analyzing Your Resume</h3>
-          <p className="text-gray-400 max-w-md mb-6">
-            We're processing your resume and job description. This will only take a moment...
+          <h3 className="text-xl font-bold mb-2 text-gray-900">Analyzing Your Resume</h3>
+          <p className="text-gray-500 max-w-md mb-6 text-sm">
+            We're processing your document and cross-referencing criteria. Please wait...
           </p>
-          <div className="w-64 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+          <div className="w-64 h-2 bg-[#f0f2f5] rounded-full overflow-hidden">
             <div 
-              className="h-full bg-blue-500 rounded-full transition-all duration-300"
+              className="h-full bg-[#00203f] rounded-full transition-all duration-300"
               style={{ width: `${uploadProgress}%` }}
             />
           </div>
@@ -180,17 +176,17 @@ const ATSChecker = () => {
 
     if (response && response.error) {
       return (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
           <div className="flex items-center mb-4">
-            <div className="h-12 w-12 bg-red-500/20 rounded-full flex items-center justify-center mr-4">
-              <FaExclamationTriangle className="text-red-400 text-2xl" />
+            <div className="h-10 w-10 bg-red-100 rounded-full flex items-center justify-center mr-4">
+              <FaExclamationTriangle className="text-red-600 text-lg" />
             </div>
-            <h3 className="text-xl font-bold text-red-400">Analysis Failed</h3>
+            <h3 className="text-lg font-bold text-red-800">Analysis Failed</h3>
           </div>
-          <p className="text-gray-300 mb-4">{response.content}</p>
+          <p className="text-red-700 mb-6 text-sm">{response.content}</p>
           <button
             onClick={resetAnalysis}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors inline-flex items-center"
+            className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors inline-flex items-center font-medium shadow-sm text-sm"
           >
             Try Again
           </button>
@@ -200,57 +196,39 @@ const ATSChecker = () => {
 
     if (response) {
       return (
-        <div className="animate-fadeIn space-y-6">
+        <div className="space-y-6">
           {/* Score & Summary Card */}
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border border-blue-500/20 shadow-2xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-blue-500/20 transition-all duration-500"></div>
-            
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+          <div className="bg-white rounded-xl p-8 border border-gray-200 shadow-sm">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="flex-1 text-center md:text-left">
-                <h3 className="text-3xl font-bold text-white mb-2">{response.type} Results</h3>
-                <p className="text-gray-400">Analysis completed successfully</p>
+                <h3 className="text-2xl font-bold text-[#00203f] mb-2">{response.type} Results</h3>
+                <p className="text-gray-600 text-sm">Analysis completed successfully.</p>
                 <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-3">
-                  <span className="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full text-xs font-medium border border-blue-500/20 flex items-center">
-                    <FaCheckCircle className="mr-1" /> PDF Verified
+                  <span className="px-3 py-1 bg-green-50 text-green-700 rounded-md text-xs font-bold border border-green-200 flex items-center">
+                    <FaCheckCircle className="mr-1.5" /> PDF Verified
                   </span>
-                  <span className="px-3 py-1 bg-purple-500/10 text-purple-400 rounded-full text-xs font-medium border border-purple-500/20 flex items-center">
-                    <FaRobot className="mr-1" /> AI Powered
+                  <span className="px-3 py-1 bg-[#00203f]/5 text-[#00203f] rounded-md text-xs font-bold border border-[#00203f]/20 flex items-center">
+                    <FaRobot className="mr-1.5" /> AI Processed
                   </span>
                 </div>
               </div>
 
               {response.score && (
-                <div className="flex flex-col items-center justify-center p-6 bg-gray-900/50 rounded-2xl border border-gray-700/50">
-                  <div className="relative h-24 w-24">
-                    <svg className="w-full h-full" viewBox="0 0 36 36">
-                      <path
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none"
-                        stroke="#1f2937"
-                        strokeWidth="3"
-                      />
-                      <path
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none"
-                        stroke={response.score >= 80 ? "#10b981" : response.score >= 60 ? "#3b82f6" : "#f59e0b"}
-                        strokeWidth="3"
-                        strokeDasharray={`${response.score}, 100`}
-                        className="transition-all duration-1000 ease-out"
-                      />
-                      <text x="18" y="20.5" textAnchor="middle" fontSize="10" fill="white" fontWeight="bold">
-                        {response.score}
-                      </text>
-                    </svg>
+                <div className="flex flex-col items-center justify-center p-6 bg-[#f0f2f5] rounded-xl border border-gray-200 min-w-[160px]">
+                  <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Overall Match</div>
+                  <div className={`text-4xl font-black ${
+                    response.score >= 80 ? 'text-green-600' : 
+                    response.score >= 60 ? 'text-blue-600' : 
+                    'text-yellow-600'
+                  }`}>
+                    {response.score}%
                   </div>
-                  <div className="mt-3 text-center">
-                    <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">Overall Score</div>
-                    <div className={`text-xl font-bold ${
-                      response.score >= 80 ? 'text-green-400' : 
-                      response.score >= 60 ? 'text-blue-400' : 
-                      'text-yellow-400'
-                    }`}>
-                      {response.score >= 80 ? 'Excellent' : response.score >= 60 ? 'Good' : 'Needs Work'}
-                    </div>
+                  <div className={`text-sm font-semibold mt-1 ${
+                    response.score >= 80 ? 'text-green-600' : 
+                    response.score >= 60 ? 'text-blue-600' : 
+                    'text-yellow-600'
+                  }`}>
+                    {response.score >= 80 ? 'Excellent' : response.score >= 60 ? 'Good' : 'Needs Revision'}
                   </div>
                 </div>
               )}
@@ -265,8 +243,8 @@ const ATSChecker = () => {
                 analysisData = typeof response.content === 'string' ? JSON.parse(response.content) : response.content;
               } catch (e) {
                 return (
-                  <div className="bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6">
-                    <div className="whitespace-pre-line text-gray-300 leading-relaxed">
+                  <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                    <div className="whitespace-pre-line text-gray-700 text-sm leading-relaxed">
                       {response.content}
                     </div>
                   </div>
@@ -279,11 +257,11 @@ const ATSChecker = () => {
                 <>
                   {/* Profession */}
                   {analysisData.profession && (
-                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
-                      <h4 className="text-blue-400 font-bold mb-2 flex items-center gap-2">
-                        <FaSearch /> Recommended Profession
+                    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                      <h4 className="text-gray-900 font-bold mb-2 flex items-center gap-2 text-sm">
+                        <FaSearch className="text-[#00203f]"/> Identified Profession
                       </h4>
-                      <p className="text-gray-200 leading-relaxed">{analysisData.profession}</p>
+                      <p className="text-gray-700 text-sm">{analysisData.profession}</p>
                     </div>
                   )}
 
@@ -291,12 +269,9 @@ const ATSChecker = () => {
                   {analysisData.ratings && (
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                       {Object.entries(analysisData.ratings).map(([key, val]) => (
-                        <div key={key} className="bg-gray-800/60 border border-gray-700/50 rounded-xl p-4 text-center">
-                          <div className="text-xs text-gray-500 uppercase mb-1">{key}</div>
-                          <div className="text-xl font-bold text-white">{val}/10</div>
-                          <div className="w-full bg-gray-700 h-1 mt-2 rounded-full overflow-hidden">
-                            <div className="bg-blue-500 h-full" style={{ width: `${val * 10}%` }}></div>
-                          </div>
+                        <div key={key} className="bg-[#f0f2f5] rounded-lg p-4 text-center border border-gray-200">
+                          <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">{key.replace(/_/g, ' ')}</div>
+                          <div className="text-xl font-black text-gray-900">{val}<span className="text-xs text-gray-500 font-medium">/10</span></div>
                         </div>
                       ))}
                     </div>
@@ -305,32 +280,30 @@ const ATSChecker = () => {
                   {/* Strengths & Improvements */}
                   {(analysisData.strengths || (analysisData.improvements || analysisData.areas_for_improvement)) && (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                       {/* Strengths */}
-                       <div className="space-y-4">
-                         <h4 className="text-green-400 font-bold flex items-center gap-2 px-1">
-                           <FaCheckCircle /> Key Strengths
+                       <div className="space-y-3">
+                         <h4 className="text-[#00203f] font-bold flex items-center gap-2 px-1 border-b border-gray-200 pb-2 text-sm">
+                           <FaCheckCircle className="text-green-600"/> Key Strengths
                          </h4>
                          {analysisData.strengths?.map((s, i) => (
-                           <div key={i} className="bg-green-500/5 border border-green-500/10 rounded-xl p-4">
-                             <div className="font-bold text-green-400 text-sm mb-1">
+                           <div key={i} className="bg-white border border-gray-200 shadow-sm rounded-lg p-4">
+                             <div className="font-bold text-gray-900 text-sm mb-1">
                                {typeof s === 'string' ? s : s.strength}
                              </div>
-                             {typeof s !== 'string' && s.description && <p className="text-gray-400 text-sm">{s.description}</p>}
+                             {typeof s !== 'string' && s.description && <p className="text-gray-600 text-xs leading-relaxed">{s.description}</p>}
                            </div>
                          ))}
                        </div>
                        
-                       {/* Improvements */}
-                       <div className="space-y-4">
-                         <h4 className="text-yellow-400 font-bold flex items-center gap-2 px-1">
-                           <FaExclamationTriangle /> Areas for Improvement
+                       <div className="space-y-3">
+                         <h4 className="text-[#00203f] font-bold flex items-center gap-2 px-1 border-b border-gray-200 pb-2 text-sm">
+                           <FaExclamationTriangle className="text-yellow-600"/> Areas for Improvement
                          </h4>
                          {(analysisData.improvements || analysisData.areas_for_improvement)?.map((a, i) => (
-                           <div key={i} className="bg-yellow-500/5 border border-yellow-500/10 rounded-xl p-4">
-                             <div className="font-bold text-yellow-400 text-sm mb-1">
+                           <div key={i} className="bg-white border border-gray-200 shadow-sm rounded-lg p-4">
+                             <div className="font-bold text-gray-900 text-sm mb-1">
                                {typeof a === 'string' ? a : (a.area || a.improvement)}
                              </div>
-                             {typeof a !== 'string' && a.description && <p className="text-gray-400 text-sm">{a.description}</p>}
+                             {typeof a !== 'string' && a.description && <p className="text-gray-600 text-xs leading-relaxed">{a.description}</p>}
                            </div>
                          ))}
                        </div>
@@ -339,17 +312,17 @@ const ATSChecker = () => {
 
                   {/* ATS Keywords Section */}
                   {(analysisData.job_description_keywords_to_include || analysisData.keyword_matches || analysisData.missing_keywords || analysisData.weakly_present_keywords) && (
-                    <div className="space-y-4">
-                      <h4 className="text-blue-400 font-bold flex items-center gap-2 px-1">
-                        <FaMagic /> Keyword Analysis
+                    <div className="space-y-4 mt-2">
+                      <h4 className="text-[#00203f] font-bold flex items-center gap-2 px-1 border-b border-gray-200 pb-2 text-sm">
+                        <FaMagic className="text-[#00203f]"/> Keyword Analysis
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {(analysisData.job_description_keywords_to_include || analysisData.keyword_matches) && (
-                          <div className="bg-green-500/5 border border-green-500/10 rounded-xl p-6">
-                            <h5 className="text-green-400 text-xs font-bold uppercase mb-3 px-1">Matches Found</h5>
+                          <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+                            <h5 className="text-gray-900 text-xs font-bold uppercase tracking-wider mb-3 px-1">Matches Found</h5>
                             <div className="flex flex-wrap gap-2">
                               {(analysisData.job_description_keywords_to_include || analysisData.keyword_matches).map((kw, i) => (
-                                <span key={i} className="px-3 py-1 bg-gray-800 text-green-300 rounded-full text-xs border border-green-500/20">
+                                <span key={i} className="px-3 py-1 bg-green-50 text-green-800 rounded text-xs font-semibold border border-green-200">
                                   {kw}
                                 </span>
                               ))}
@@ -357,11 +330,11 @@ const ATSChecker = () => {
                           </div>
                         )}
                         {(analysisData.missing_keywords || analysisData.weakly_present_keywords) && (
-                          <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-6">
-                            <h5 className="text-red-400 text-xs font-bold uppercase mb-3 px-1">Missing / Weak Gaps</h5>
+                          <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+                            <h5 className="text-gray-900 text-xs font-bold uppercase tracking-wider mb-3 px-1">Missing / Weak Gaps</h5>
                             <div className="flex flex-wrap gap-2">
                               {[...(analysisData.missing_keywords || []), ...(analysisData.weakly_present_keywords || [])].map((kw, i) => (
-                                <span key={i} className="px-3 py-1 bg-gray-800 text-red-300 rounded-full text-xs border border-red-500/20">
+                                <span key={i} className="px-3 py-1 bg-red-50 text-red-800 rounded text-xs font-semibold border border-red-200">
                                   {kw}
                                 </span>
                               ))}
@@ -372,143 +345,26 @@ const ATSChecker = () => {
                     </div>
                   )}
 
-                  {/* Reformatting & Recommendations */}
-                  {(analysisData.reformatting_suggestions || analysisData.keyword_density_recommendations || analysisData.keyword_density_advice) && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {analysisData.reformatting_suggestions && (
-                        <div className="space-y-4">
-                          <h4 className="text-white font-bold flex items-center gap-2 px-1">
-                            <FaListAlt /> Reformatting Suggestions
-                          </h4>
-                          {Array.isArray(analysisData.reformatting_suggestions) ? (
-                            <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4 space-y-2">
-                              {analysisData.reformatting_suggestions.map((s, i) => (
-                                <p key={i} className="text-gray-400 text-xs leading-relaxed flex gap-2">
-                                  <span className="text-blue-400">•</span> {s}
-                                </p>
-                              ))}
-                            </div>
-                          ) : (
-                            Object.entries(analysisData.reformatting_suggestions).map(([key, val], i) => (
-                              <div key={i} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
-                                <div className="capitalize font-bold text-blue-400 mb-1 text-sm">{key.replace(/_/g, ' ')}</div>
-                                <p className="text-gray-400 text-xs leading-relaxed">{val}</p>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      )}
-                      {(analysisData.keyword_density_recommendations || analysisData.keyword_density_advice) && (
-                        <div className="space-y-4">
-                          <h4 className="text-white font-bold flex items-center gap-2 px-1">
-                            <FaSearch /> Keyword Insights
-                          </h4>
-                          <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
-                            {typeof (analysisData.keyword_density_recommendations || analysisData.keyword_density_advice) === 'string' ? (
-                              <p className="text-gray-400 text-xs leading-relaxed">{analysisData.keyword_density_recommendations || analysisData.keyword_density_advice}</p>
-                            ) : (
-                              Object.entries(analysisData.keyword_density_recommendations || analysisData.keyword_density_advice).map(([key, val], i) => (
-                                <div key={i} className="mb-2 last:mb-0">
-                                  <div className="capitalize font-bold text-purple-400 text-xs mb-1">{key.replace(/_/g, ' ')}</div>
-                                  <p className="text-gray-400 text-[11px] leading-relaxed">{val}</p>
-                                </div>
-                              ))
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Tailoring Tips & Priority Actions */}
-                  {(analysisData.tailoring_tips || analysisData.priority_actions) && (
-                    <div className="space-y-4">
-                      <h4 className="text-blue-400 font-bold flex items-center gap-2 px-1">
-                        <FaRobot /> Strategic Recommendations
-                      </h4>
-                      <div className="grid grid-cols-1 gap-4">
-                        {(analysisData.tailoring_tips || analysisData.priority_actions).map((tip, i) => (
-                          <div key={i} className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-5 group hover:bg-blue-500/10 transition-all">
-                            <div className="flex gap-4">
-                              <div className="h-10 w-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0 text-blue-400 font-bold">
-                                {i + 1}
-                              </div>
-                              <div className="space-y-1">
-                                <div className="font-bold text-gray-200">
-                                  {typeof tip === 'string' ? tip : tip.tip}
-                                </div>
-                                {typeof tip !== 'string' && tip.action && (
-                                  <div className="text-sm text-gray-400 bg-gray-900/50 p-3 rounded-lg border border-gray-800 mt-2">
-                                    <span className="text-blue-400 font-bold uppercase text-[10px] block mb-1">Recommended Action</span>
-                                    {tip.action}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Section Reviews */}
-                  {(analysisData.review_major_sections || analysisData.section_review) && (
-                    <div className="space-y-4">
-                      <h4 className="text-white font-bold flex items-center gap-2 px-1">
-                        <FaListAlt /> Section by Section Review
-                      </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {Object.entries(analysisData.review_major_sections || analysisData.section_review).map(([name, feedback]) => (
-                          <div key={name} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
-                            <div className="capitalize font-bold text-blue-400 mb-2 border-b border-gray-700/50 pb-1 text-sm">{name.replace(/_/g, ' ')}</div>
-                            <div className="space-y-2">
-                              {typeof feedback === 'string' ? (
-                                <p className="text-gray-400 text-xs leading-relaxed">{feedback}</p>
-                              ) : (
-                                <>
-                                  <div className="text-xs">
-                                    <span className="text-green-400 font-medium mr-1">Strengths:</span>
-                                    <span className="text-gray-400">{feedback.strengths}</span>
-                                  </div>
-                                  <div className="text-xs">
-                                    <span className="text-yellow-400 font-medium mr-1">Improvements:</span>
-                                    <span className="text-gray-400">{feedback.improvements}</span>
-                                  </div>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
                   {/* Fit Assessment / Summaries */}
                   {(analysisData.fit_assessment || analysisData.final_summary || analysisData.career_story) && (
-                    <div className="space-y-4">
-                      <h4 className="text-purple-400 font-bold flex items-center gap-2 px-1">
-                        <FaFileAlt /> Executive Summary & Strategy
+                    <div className="space-y-4 mt-2">
+                      <h4 className="text-[#00203f] font-bold flex items-center gap-2 px-1 border-b border-gray-200 pb-2 text-sm">
+                        <FaFileAlt className="text-[#00203f]"/> Executive Summary
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {(analysisData.fit_assessment || analysisData.hiring_readiness) && (
-                          <div className="bg-purple-500/5 border border-purple-500/10 rounded-xl p-6">
-                            <h5 className="text-purple-400 text-xs font-bold uppercase mb-3 px-1">Hiring Readiness</h5>
-                            <p className="text-gray-300 text-sm leading-relaxed">{analysisData.fit_assessment || analysisData.hiring_readiness}</p>
+                          <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-5">
+                            <h5 className="text-gray-900 text-xs font-bold uppercase tracking-wider mb-2">Hiring Readiness</h5>
+                            <p className="text-gray-600 text-sm leading-relaxed">{analysisData.fit_assessment || analysisData.hiring_readiness}</p>
                           </div>
                         )}
                         {(analysisData.final_summary || analysisData.summary) && (
-                          <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-6">
-                            <h5 className="text-blue-400 text-xs font-bold uppercase mb-3 px-1">Final Conclusion</h5>
-                            <p className="text-gray-300 text-sm leading-relaxed">{analysisData.final_summary || analysisData.summary}</p>
+                          <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-5">
+                            <h5 className="text-gray-900 text-xs font-bold uppercase tracking-wider mb-2">Final Conclusion</h5>
+                            <p className="text-gray-600 text-sm leading-relaxed">{analysisData.final_summary || analysisData.summary}</p>
                           </div>
                         )}
                       </div>
-                      {analysisData.career_story && (
-                        <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-6">
-                          <h5 className="text-gray-400 text-xs font-bold uppercase mb-3 px-1">Career Narrative Assessment</h5>
-                          <p className="text-gray-300 text-sm leading-relaxed">{analysisData.career_story}</p>
-                        </div>
-                      )}
                     </div>
                   )}
                 </>
@@ -516,13 +372,12 @@ const ATSChecker = () => {
             })()}
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+          <div className="flex justify-center mt-8 pb-4">
             <button
               onClick={resetAnalysis}
-              className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl 
-                       transition-all duration-300 shadow-lg hover:shadow-blue-500/20 font-bold flex items-center justify-center gap-2"
+              className="px-6 py-2.5 bg-white border border-gray-300 hover:bg-[#f0f2f5] text-gray-800 rounded-md transition-colors shadow-sm font-semibold flex items-center justify-center gap-2 text-sm"
             >
-              <FaRobot /> New Analysis
+              <FaArrowLeft /> Start New Analysis
             </button>
           </div>
         </div>
@@ -534,7 +389,7 @@ const ATSChecker = () => {
 
   if (view === "history") {
     return (
-      <div className="min-h-screen bg-[#070b14] pt-24 pb-12 px-4">
+      <div className="min-h-screen bg-[#f4f5f8] pt-24 pb-12 px-4">
         <div className="max-w-4xl mx-auto">
           <AtsHistory 
             onBack={() => setView("checker")} 
@@ -547,7 +402,7 @@ const ATSChecker = () => {
 
   if (view === "detail") {
     return (
-      <div className="min-h-screen bg-[#070b14] pt-24 pb-12 px-4">
+      <div className="min-h-screen bg-[#f4f5f8] pt-24 pb-12 px-4">
         <div className="max-w-4xl mx-auto">
           <AtsDetail 
             analysisId={selectedAnalysisId} 
@@ -559,210 +414,162 @@ const ATSChecker = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f5f8] text-gray-900 pt-16 pb-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 animate-gradient"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]"></div>
-        {/* Floating Particles */}
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 bg-blue-500/20 rounded-full animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${5 + Math.random() * 5}s`
-            }}
-          />
-        ))}
-      </div>
+    <div className="min-h-screen bg-[#f4f5f8] text-gray-900 pt-12 pb-12 px-4 sm:px-6 lg:px-8 font-sans">
       
-      <div className="max-w-[1400px] mx-auto relative">
+      <div className="max-w-7xl mx-auto">
         {/* Page Header */}
-        <div className={`mb-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6 transition-all duration-700 delay-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b-2 border-[#00203f] pb-4">
           <div>
-            <h1 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">Resume</span> Checker
+            <h1 className="text-3xl font-bold text-[#00203f] tracking-tight">
+              Resume Checker
             </h1>
+            <p className="text-gray-600 text-sm mt-1">Analyze and optimize your document against job criteria.</p>
           </div>
           
           <button 
             onClick={() => setView("history")}
-            className="px-6 py-3 bg-gray-800/60 border border-gray-700 rounded-xl text-gray-300 hover:text-white hover:bg-gray-700 transition-all flex items-center gap-3 font-bold group"
+            className="px-4 py-2 bg-white border border-gray-300 rounded text-gray-700 hover:text-[#00203f] hover:border-[#00203f] shadow-sm transition-all flex items-center gap-2 font-semibold text-sm"
           >
-            <FaHistory className="group-hover:rotate-[-45deg] transition-transform" /> 
-            View Analysis History
+            <FaHistory className="text-gray-500" /> 
+            Usage History
           </button>
         </div>
 
-        {/* Conditional Layout: Show both columns OR results-only */}
+        {/* Conditional Layout */}
         {showInputSection ? (
-          /* Two Column Layout (Input + Results) */
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column: Resume Upload & Job Description */}
-            <div className={`transform transition-all duration-500 delay-200 
-                            ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-              <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6 shadow-xl">
-                <h2 className="text-2xl font-bold mb-6 flex items-center">
-                  <FaFileUpload className="mr-2 text-blue-400" />
-                  Upload Your Resume
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            {/* Left Column: Form Input */}
+            <div className="lg:col-span-5">
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                <h2 className="text-lg font-bold mb-6 text-[#00203f] border-b border-gray-100 pb-3">
+                  Document Details
                 </h2>
-                {/* Daily limit Warning Banner*/}
+
+                {/* Daily limit Warning Banner */}
                 {limitError &&(
-                  <div className="bg-red-900/40 border border-red-500/50 rounded-xl p-4 mb-6 flex items-start gap-3 shadow-lg animate-fadeIn">
-                    <FaExclamationTriangle className="text-red-400 text-xl flex-shrink-0 mt-0.5" />
+                  <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6 flex items-start gap-3">
+                    <FaExclamationTriangle className="text-red-600 text-lg flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-bold text-red-400">Daily Limit Reached</p>
-                      <p className="text-red-200 text-sm mt-1">{limitError}</p>
+                      <p className="font-bold text-red-800 text-sm">Daily Limit Reached</p>
+                      <p className="text-red-700 text-xs mt-1">{limitError}</p>
                     </div>
                   </div>
                 )}
-                {/*----------*/}
+
                 {/* PDF Upload Area */}
-                <div 
-                  className={`relative mb-6 border-2 border-dashed rounded-xl p-8 text-center transition-all
-                            ${!file && 'hover:border-blue-400'} 
-                            ${dragActive ? 'border-blue-400 bg-blue-500/10' : 'border-gray-600'} 
-                            ${file ? 'border-green-400 bg-green-500/10' : ''}`}
-                  onDragEnter={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDragOver={handleDrag}
-                  onDrop={handleDrop}
-                >
-                  <input 
-                    type="file" 
-                    accept=".pdf" 
-                    onChange={handleFileChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    disabled={loading}
-                  />
-                  
-                  <div className="flex flex-col items-center justify-center py-4">
-                    {file ? (
-                      <>
-                        <div className="h-16 w-16 mb-4 bg-green-500/20 rounded-full flex items-center justify-center animate-pulse">
-                          <FaCheckCircle className="text-green-400 text-2xl" />
-                        </div>
-                        <p className="text-green-400 font-medium mb-1">{file.name}</p>
-                        <p className="text-gray-400 text-sm">{Math.round(file.size / 1024)} KB</p>
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setFile(null);
-                          }}
-                          className="mt-4 px-3 py-1 bg-gray-700 text-gray-300 rounded-lg text-sm hover:bg-gray-600 transition-colors"
-                        >
-                          Change File
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <div className="h-16 w-16 mb-4 bg-blue-500/20 rounded-full flex items-center justify-center">
-                          <FaFileAlt className="text-blue-400 text-2xl" />
-                        </div>
-                        <p className="text-white font-medium mb-2">Drag & drop your resume here</p>
-                        <p className="text-gray-400 text-sm mb-4">or click to browse files (PDF only)</p>
-                        <div className="px-4 py-2 bg-blue-500/20 text-blue-400 rounded-lg border border-blue-500/30 
-                                    hover:bg-blue-500/30 transition-colors inline-flex items-center">
-                          <FaFileUpload className="mr-2" /> Select PDF File
-                        </div>
-                      </>
-                    )}
+                <div className="mb-6">
+                  <label className="block text-sm font-bold text-gray-900 mb-2">
+                    Upload Resume <span className="text-red-500">*</span>
+                  </label>
+                  <div 
+                    className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-all cursor-pointer
+                              ${!file && 'border-gray-300 bg-[#f0f2f5] hover:bg-gray-100 hover:border-gray-400'} 
+                              ${dragActive ? 'border-[#00203f] bg-[#00203f]/5' : ''} 
+                              ${file ? 'border-green-500 bg-green-50' : ''}`}
+                    onDragEnter={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDragOver={handleDrag}
+                    onDrop={handleDrop}
+                  >
+                    <input 
+                      type="file" 
+                      accept=".pdf" 
+                      onChange={handleFileChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      disabled={loading}
+                    />
+                    
+                    <div className="flex flex-col items-center justify-center">
+                      {file ? (
+                        <>
+                          <div className="h-10 w-10 mb-2 bg-white shadow-sm rounded-full flex items-center justify-center border border-green-200">
+                            <FaCheckCircle className="text-green-600 text-lg" />
+                          </div>
+                          <p className="text-gray-900 font-semibold text-sm mb-1 truncate max-w-full px-2">{file.name}</p>
+                          <p className="text-gray-500 text-xs">{Math.round(file.size / 1024)} KB</p>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFile(null);
+                            }}
+                            className="mt-3 px-3 py-1 bg-white border border-gray-300 text-gray-600 rounded text-xs font-semibold hover:bg-gray-50 shadow-sm z-20 relative"
+                          >
+                            Change File
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <div className="h-10 w-10 mb-2 bg-white shadow-sm border border-gray-200 rounded-full flex items-center justify-center">
+                            <FaFileAlt className="text-gray-500 text-lg" />
+                          </div>
+                          <p className="text-gray-900 font-semibold text-sm mb-1">Drag & drop your resume</p>
+                          <p className="text-gray-500 text-xs mb-3">or click to browse files (PDF)</p>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
 
                 {/* Job Description */}
-                <div className="mb-6">
-                  <label className="block text-lg font-semibold mb-2 flex items-center">
-                    <FaListAlt className="mr-2 text-blue-400" />
-                    Job Description
+                <div className="mb-8">
+                  <label className="block text-sm font-bold text-gray-900 mb-2">
+                    Target Job Description <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative group">
-                    <textarea
-                      className="w-full p-4 bg-gray-700/50 border border-gray-600/50 rounded-xl 
-                               text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/50 
-                               focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 min-h-[180px]
-                               group-hover:border-blue-500/30"
-                      placeholder="Paste the job description here to analyze your resume's compatibility..."
-                      value={jobDescription}
-                      onChange={(e) => setJobDescription(e.target.value)}
-                      disabled={loading}
-                    />
-                  </div>
+                  <textarea
+                    className="w-full p-3 bg-[#f0f2f5] border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 
+                               focus:outline-none focus:ring-1 focus:ring-[#00203f] focus:border-[#00203f] transition-all min-h-[140px] text-sm resize-y"
+                    placeholder="Paste the target job description here..."
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                    disabled={loading}
+                  />
                 </div>
-
-                
-                
                 
                 {/* Submit Button */}
                 <button
-                  className={`w-full p-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2
-                           ${loading 
-                             ? 'bg-gray-700 cursor-not-allowed' 
-                             : file 
-                               ? 'bg-blue-500 hover:bg-blue-600 shadow-lg hover:shadow-blue-500/20' 
-                               : 'bg-gray-700 cursor-not-allowed'}`}
+                  className={`w-full py-3 rounded-md font-bold transition-colors flex items-center justify-center gap-2 text-sm
+                           ${loading || !file 
+                             ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                             : 'bg-[#00203f] text-white hover:bg-[#001529] shadow-md'}`}
                   onClick={analyzeResume}
                   disabled={loading || !file}
                 >
                   {loading ? (
                     <>
-                      <div className="animate-spin h-5 w-5 mr-2 border-2 border-white border-t-transparent rounded-full" />
-                      Analyzing Resume...
+                      <div className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full" />
+                      Processing...
                     </>
                   ) : (
-                    <>
-                      <FaRobot className="mr-1" /> 
-                      {file ? 'Analyze Resume' : 'Upload a Resume to Start'}
-                    </>
+                    'Analyze Document'
                   )}
                 </button>
-                
-                {loading && (
-                  <div className="mt-4">
-                    <div className="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-blue-500 rounded-full transition-all duration-300"
-                        style={{ width: `${uploadProgress}%` }}
-                      />
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-400 mt-1">
-                      <span>Analyzing...</span>
-                      <span>{Math.round(uploadProgress)}%</span>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* Right Column: Results */}
-            <div className={`transform transition-all duration-500 delay-300 
-                            ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-              <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6 h-full shadow-xl">
-                <h2 className="text-2xl font-bold mb-6 flex items-center">
-                  <FaSearch className="mr-2 text-blue-400" />
-                  Analysis Results
+            {/* Right Column: Results Placeholder */}
+            <div className="lg:col-span-7">
+              <div className="bg-white rounded-xl p-6 h-full shadow-sm border border-gray-200">
+                <h2 className="text-lg font-bold mb-6 text-[#00203f] border-b border-gray-100 pb-3">
+                  System Analysis
                 </h2>
                 {renderResults()}
               </div>
             </div>
           </div>
         ) : (
-          /* Results Only Layout (after scanning - left section hidden) */
+          /* Results Only Layout */
           <div className="max-w-5xl mx-auto">
-            <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6 md:p-8 shadow-xl">
-              <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-700/50">
-                <h2 className="text-2xl font-bold flex items-center">
-                  <FaSearch className="mr-2 text-blue-400" />
-                  Analysis Results
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
+                <h2 className="text-xl font-bold text-[#00203f]">
+                  Analysis Report
                 </h2>
                 <button
                   onClick={resetAnalysis}
-                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors flex items-center gap-2 text-sm"
+                  className="px-4 py-2 bg-white border border-gray-300 hover:bg-[#f0f2f5] text-gray-700 rounded-md transition-colors flex items-center gap-2 text-sm font-semibold shadow-sm"
                 >
-                  <FaArrowLeft className="text-sm" /> New Analysis
+                  <FaArrowLeft className="text-xs" /> New Scan
                 </button>
               </div>
               {renderResults()}
@@ -770,55 +577,6 @@ const ATSChecker = () => {
           </div>
         )}
       </div>
-
-      <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes gradient {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        
-        @keyframes float {
-          0% {
-            transform: translateY(0) translateX(0);
-          }
-          50% {
-            transform: translateY(-10px) translateX(5px);
-          }
-          100% {
-            transform: translateY(0) translateX(0);
-          }
-        }
-        
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
-        .animate-gradient {
-          background-size: 200% 200%;
-          animation: gradient 15s ease infinite;
-        }
-        
-        .animate-float {
-          animation: float 5s ease-in-out infinite;
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.5s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 };

@@ -32,7 +32,7 @@ func AnalyzeResume(c *gin.Context) {
 	const dailylimit = 10
 	var todayCount int
 
-	err := config.DB.QueryRow(context.Background(), "SELECT COUNT(*) FROM resume_analysis WHERE job_seeker_id = $1 AND DATE(created_at) = CURRENT_DATE", seekerID).Scan((&todayCount))
+	err := config.DB.QueryRow(context.Background(), "SELECT COUNT(*) FROM resume_analyses WHERE job_seeker_id = $1 AND DATE(created_at) = CURRENT_DATE", seekerID).Scan((&todayCount))
 
 	if err != nil {
 		log.Println("Error checking daily limit:", err)
