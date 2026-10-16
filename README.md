@@ -12,7 +12,7 @@ You must have the following installed on your machine:
 You will need two `.env` files.
 **Backend `.env`** (Create inside the `/Backend` folder):
 ```env
-MISTRAL_API_KEY=your_mistral_key
+SARVAM_API_KEY=your_sarvam_key
 AWS_ACCESS_KEY_ID=your_aws_key
 AWS_SECRET_ACCESS_KEY=your_aws_secret
 AWS_REGION=us-east-1

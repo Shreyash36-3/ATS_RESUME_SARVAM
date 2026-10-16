@@ -20,16 +20,20 @@ import (
 )
 
 func AnalyzeResume(c *gin.Context) {
-	// 1. Get Seeker ID from context (set by AuthMiddleware)
+	// Get Seeker ID from context (set by AuthMiddleware)
 	seekerIDStr, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
-	seekerID, _ := strconv.Atoi(fmt.Sprintf("%v", seekerIDStr))
+	seekerID, er := strconv.Atoi(fmt.Sprintf("%v", seekerIDStr))
+	if er != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
 
 	//Daily limit check
-	const dailylimit = 10
+	const dailylimit = 2
 	var todayCount int
 
 	err := config.DB.QueryRow(context.Background(), "SELECT COUNT(*) FROM resume_analyses WHERE job_seeker_id = $1 AND DATE(created_at) = CURRENT_DATE", seekerID).Scan((&todayCount))
@@ -41,10 +45,10 @@ func AnalyzeResume(c *gin.Context) {
 	}
 
 	if todayCount >= dailylimit {
-		c.JSON(http.StatusTooManyRequests, gin.H{"error": "You have reached your daily limit of 10 analyses . Come back tomorrow!"})
+		c.JSON(http.StatusTooManyRequests, gin.H{"error": "You have reached your daily limit of 2 analyses . Come back tomorrow!"})
 		return
 	}
-	// 2. Parse Multipart Form
+	// Parse Multipart Form
 	file, header, err := c.Request.FormFile("resume")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to get resume file"})
@@ -55,7 +59,7 @@ func AnalyzeResume(c *gin.Context) {
 	jobDescription := c.PostForm("job_description")
 	analysisType := c.PostForm("analysis_type")
 
-	// 3. Extract Text from PDF
+	// Extract Text from PDF
 	// Read file into buffer for multiple uses (extraction and upload)
 	fileBytes, err := io.ReadAll(file)
 	if err != nil {
@@ -69,7 +73,7 @@ func AnalyzeResume(c *gin.Context) {
 		return
 	}
 
-	// 4. Upload to S3
+	// Upload to S3
 	s3Client, err := helpers.NewS3Client(
 		os.Getenv("AWS_ACCESS_KEY_ID"),
 		os.Getenv("AWS_SECRET_ACCESS_KEY"),
@@ -91,18 +95,22 @@ func AnalyzeResume(c *gin.Context) {
 	}
 	/*resumeURL := "https://dummy-url.com/" + header.Filename*/
 
-	// 5. Call Mistral AI
-	mistralAPIKey := os.Getenv("MISTRAL_API_KEY")
+	// Call Sarvam AI
+	sarvamAPIKey := os.Getenv("SARVAM_API_KEY")
+	if sarvamAPIKey == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "SARVAM_API_KEY is not configured"})
+		return
+	}
 	prompt := constructPrompt(pdfText, jobDescription, analysisType)
 
-	analysisResult, atsScore, err := callMistralAI(mistralAPIKey, prompt)
+	analysisResult, atsScore, err := callSarvamAI(sarvamAPIKey, prompt)
 	if err != nil {
-		fmt.Printf("Mistral AI Error: %v\n", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get analysis from Mistral AI", "details": err.Error()})
+		fmt.Printf("Sarvam AI Error: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get analysis from Sarvam AI", "details": err.Error()})
 		return
 	}
 
-	// 6. Save to DB
+	// Save to DB
 	analysis := schema.ResumeAnalysis{
 		JobSeekerID:    seekerID,
 		ResumeURL:      resumeURL,
@@ -117,7 +125,7 @@ func AnalyzeResume(c *gin.Context) {
 		fmt.Printf("Failed to save analysis to DB: %v\n", err)
 	}
 
-	// 7. Return Response
+	// Return Response
 	fmt.Printf("Analysis Successful: Score=%d\n", atsScore)
 	c.JSON(http.StatusOK, gin.H{
 		"score":   atsScore,
@@ -388,15 +396,17 @@ JOB DESCRIPTION:
 `, commonRules, taskPrompt, resumeText, jd)
 }
 
-func callMistralAI(apiKey, prompt string) (string, int, error) {
-	url := "https://api.mistral.ai/v1/chat/completions"
+func callSarvamAI(apiKey, prompt string) (string, int, error) {
+	url := "https://api.sarvam.ai/v1/chat/completions"
 
 	payload := map[string]interface{}{
-		"model": "mistral-small-latest",
+		"model": "sarvam-105b",
 		"messages": []map[string]string{
 			{"role": "user", "content": prompt},
 		},
-		"response_format": map[string]string{"type": "json_object"},
+		"response_format":  map[string]string{"type": "json_object"},
+		"reasoning_effort": nil, // Disable reasoning tokens so they do not consume the analysis output budget.
+		"max_tokens":       4096,
 	}
 
 	jsonData, _ := json.Marshal(payload)
@@ -406,7 +416,7 @@ func callMistralAI(apiKey, prompt string) (string, int, error) {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+apiKey)
+	req.Header.Set("api-subscription-key", apiKey)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -417,7 +427,7 @@ func callMistralAI(apiKey, prompt string) (string, int, error) {
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		return "", 0, fmt.Errorf("mistral API error: %s", string(body))
+		return "", 0, fmt.Errorf("Sarvam API error: %s", string(body))
 	}
 
 	var result struct {
@@ -433,25 +443,25 @@ func callMistralAI(apiKey, prompt string) (string, int, error) {
 	}
 
 	if len(result.Choices) == 0 {
-		return "", 0, fmt.Errorf("no response from Mistral AI")
+		return "", 0, fmt.Errorf("no response from Sarvam AI")
 	}
 
-	var mistralMap map[string]interface{}
-	if err := json.Unmarshal([]byte(result.Choices[0].Message.Content), &mistralMap); err != nil {
+	var analysisMap map[string]interface{}
+	if err := json.Unmarshal([]byte(result.Choices[0].Message.Content), &analysisMap); err != nil {
 		// Fallback if not valid JSON score/analysis
 		return result.Choices[0].Message.Content, 70, nil
 	}
 
 	// Extract score from either 'ats_score' or 'score'
 	score := 70
-	if s, ok := mistralMap["ats_score"].(float64); ok {
+	if s, ok := analysisMap["ats_score"].(float64); ok {
 		score = int(s)
-	} else if s, ok := mistralMap["score"].(float64); ok {
+	} else if s, ok := analysisMap["score"].(float64); ok {
 		score = int(s)
 	}
 
 	// Return the entire map as the analysis JSON
-	analysisJSON, _ := json.Marshal(mistralMap)
+	analysisJSON, _ := json.Marshal(analysisMap)
 	return string(analysisJSON), score, nil
 }
 

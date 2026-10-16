@@ -1,0 +1,7 @@
+.env
+*.dumb
+*.sql
+backup.*
+.git
+.vscode
+.idea

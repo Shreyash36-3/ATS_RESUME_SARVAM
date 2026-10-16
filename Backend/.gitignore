@@ -1,0 +1,22 @@
+# Environment & secrets
+.env
+
+# Database dumps — contains real data, never commit
+*.dump
+*.sql
+backup.*
+
+# Go build output
+bin/
+*.exe
+*.test
+*.out
+
+# Frontend (only relevant if this repo also has JS)
+node_modules/
+dist/
+
+# OS / Editor
+.DS_Store
+.vscode/
+.idea/

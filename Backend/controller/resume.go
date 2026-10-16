@@ -84,7 +84,7 @@ func ExtractResumeHandler(c *gin.Context) {
 	}
 	defer file.Close()
 
-	// 1. Extract Text from PDF
+	// Extract Text from PDF
 	fileBytes, err := io.ReadAll(file)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read file"})
@@ -97,14 +97,18 @@ func ExtractResumeHandler(c *gin.Context) {
 		return
 	}
 
-	// 2. Call Mistral AI for Extraction
-	mistralAPIKey := os.Getenv("MISTRAL_API_KEY")
-	prompt := constructExtractionPrompt(pdfText)
+	// Call Sarvam AI for extraction. The shared callSarvamAI helper is defined
+	// in analyze_resume_sarvam.go in the same package.
+	sarvamAPIKey := os.Getenv("SARVAM_API_KEY")
+	if sarvamAPIKey == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "SARVAM_API_KEY is not configured"})
+		return
+	}
 
-	// Reuse callMistralAI from analyze_resume.go (same package)
-	analysisResult, _, err := callMistralAI(mistralAPIKey, prompt)
+	prompt := constructExtractionPrompt(pdfText)
+	analysisResult, _, err := callSarvamAI(sarvamAPIKey, prompt)
 	if err != nil {
-		fmt.Printf("Mistral AI Extraction Error: %v\n", err)
+		fmt.Printf("Sarvam AI Extraction Error: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to extract data using AI", "details": err.Error()})
 		return
 	}
@@ -116,8 +120,8 @@ func ExtractResumeHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"data":    extractedData,
+		"success":  true,
+		"data":     extractedData,
 		"filename": header.Filename,
 	})
 }

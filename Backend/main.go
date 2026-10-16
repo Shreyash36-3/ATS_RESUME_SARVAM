@@ -4,33 +4,41 @@ import (
 	"Backend/config"
 	"Backend/controller"
 	"log"
+	"net/http"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
-// Dummy auth middleware
-func DummyAuthMiddleware() gin.HandlerFunc {
+// auth middleware
+func InternalAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Set("userID", "1")
+		studentID := c.GetHeader("X-Internal-Student-ID")
+		if studentID == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing internal authentication header"})
+			c.Abort()
+			return
+		}
+		c.Set("userID", studentID)
 		c.Next()
 	}
 }
 
 func main() {
-	// 1. Connect to Database
+	// Connect to Database
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("No .env file")
 	}
 	config.ConnectDB()
 
-	// 2. Initialize Gin Router
+	// Initialize Gin Router
 	r := gin.Default()
 
-	// 3. Configure CORS (Allows React frontend to talk to this backend)
-	// 3. Configure Custom CORS
+	// Configure CORS (Allows React frontend to talk to this backend)
+	// Configure Custom CORS
 	r.Use(cors.New(cors.Config{
 		AllowAllOrigins:  true,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
@@ -39,9 +47,9 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	// 4. Setup Routes
+	// Setup Routes
 	api := r.Group("/ats")
-	api.Use(DummyAuthMiddleware())
+	api.Use(InternalAuthMiddleware())
 	{
 		// Analysis routes (mapped to analyze_resume.go)
 		api.POST("/analyze", controller.AnalyzeResume)
@@ -59,7 +67,11 @@ func main() {
 		api.PUT("/resume/:id", controller.UpdateResumeHandler)
 	}
 
-	// 5. Start Server
-	log.Println("Server running on http://localhost:8080")
-	r.Run(":8080")
+	// Start Server
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Println("Server running on port " + port)
+	r.Run(":" + port)
 }
